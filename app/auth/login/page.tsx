@@ -32,9 +32,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-400 to-purple-500">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
+        <h1 className="text-2xl font-bold mb-6 text-center text-gray-500">Login</h1>
 
         {errorMsg && <div className="text-red-500 mb-4">{errorMsg}</div>}
 
@@ -44,7 +44,7 @@ export default function LoginPage() {
             <input
               type="email"
               {...register("email")}
-              className="w-full border px-3 py-2 rounded"
+              className="w-full border px-3 py-2 rounded focus:border-gray-600 focus:outline-none"
             />
             {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
           </div>
@@ -54,20 +54,23 @@ export default function LoginPage() {
             <input
               type="password"
               {...register("password")}
-              className="w-full border px-3 py-2 rounded"
+              className="w-full border px-3 py-2 rounded focus:border-gray-600 focus:outline-none"
             />
             {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
           </div>
 
           <div>
             <label className="block text-gray-700 mb-1">Role</label>
-            <select {...register("role")} className="w-full border px-3 py-2 rounded">
+            <select
+              {...register("role")}
+              className="w-full border px-3 py-2 rounded focus:border-gray-600 focus:outline-none "
+            >
+                            <option value="">Select User type</option>
               <option value="PATIENT">Patient</option>
               <option value="DOCTOR">Doctor</option>
             </select>
             {errors.role && <p className="text-red-500 text-sm">{errors.role.message}</p>}
           </div>
-
           <button
             type="submit"
             disabled={isPending}
