@@ -7,31 +7,76 @@ import {
 } from "../../../hooks/useAppointments";
 import { AppointmentCard } from "../../components/AppointmentCard";
 
+// Modal Component
+function CancelModal({
+  isOpen,
+  onClose,
+  onCancel,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onCancel: () => void;
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-slate-900 bg-opacity-50 z-50">
+      <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-sm">
+        <h2 className="text-xl font-semibold text-slate-800 mb-4 text-center">
+          Cancel Appointment
+        </h2>
+        <p className="text-slate-600 mb-6 text-center">
+          This appointment will be cancelled immediately.
+        </p>
+        <div className="flex justify-center">
+          <button
+            onClick={onCancel}
+            className="px-6 py-2 bg-red-500 text-white rounded-xl shadow hover:bg-red-600 transition-all duration-200"
+          >
+            Cancel Appointment
+          </button>
+        </div>
+        <button
+          onClick={onClose}
+          className="mt-4 block mx-auto text-slate-500 hover:text-slate-700 text-sm"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function PatientAppointments() {
   const [statusFilter, setStatusFilter] = useState("PENDING");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Always pass a status filter, even for "PENDING"
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<string | null>(
+    null
+  );
+
   const {
     data: appointmentsData,
     isLoading,
     error,
     refetch,
-  } = usePatientAppointments(
-    statusFilter, // Always pass the status filter
-    currentPage,
-    true
-  );
-  console.log("Appointments data:", appointmentsData);
-  console.log("Status filter:", statusFilter);
+  } = usePatientAppointments(statusFilter, currentPage, true);
+
   const { cancelAppointment, isPending: isCancelling } = useCancelAppointment();
 
-  const handleCancel = (appointmentId: string) => {
-    if (!confirm("Are you sure you want to cancel this appointment?")) {
-      return;
-    }
+  const handleCancelClick = (appointmentId: string) => {
+    setSelectedAppointment(appointmentId);
+    setModalOpen(true);
+  };
 
-    cancelAppointment(appointmentId);
+  const handleCancel = () => {
+    if (selectedAppointment) {
+      cancelAppointment(selectedAppointment);
+      setSelectedAppointment(null);
+    }
+    setModalOpen(false);
   };
 
   if (error) {
@@ -60,6 +105,13 @@ export default function PatientAppointments() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 p-6">
+      {/* Cancel Modal */}
+      <CancelModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onCancel={handleCancel}
+      />
+
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6 border border-blue-100">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
@@ -144,7 +196,7 @@ export default function PatientAppointments() {
             >
               <AppointmentCard
                 appointment={appointment}
-                onAction={handleCancel}
+                onAction={handleCancelClick}
                 showActions={
                   appointment.status === "PENDING" ||
                   appointment.status === "CONFIRMED"
@@ -155,14 +207,13 @@ export default function PatientAppointments() {
         )}
       </div>
 
-      {/* Pagination */}
+      {/* Pagination (unchanged) */}
       {appointmentsData && appointmentsData.totalPages > 1 && (
         <div className="bg-white rounded-2xl shadow-sm p-6 mt-6 border border-blue-100">
           <div className="flex flex-col sm:flex-row items-center justify-between">
             <div className="text-sm text-slate-600 mb-4 sm:mb-0">
               Page {currentPage} of {appointmentsData.totalPages}
             </div>
-
             <div className="flex space-x-2">
               <button
                 onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
@@ -171,7 +222,6 @@ export default function PatientAppointments() {
               >
                 Previous
               </button>
-
               <div className="flex space-x-1">
                 {Array.from(
                   { length: Math.min(5, appointmentsData.totalPages) },
@@ -204,13 +254,11 @@ export default function PatientAppointments() {
                     );
                   }
                 )}
-
                 {appointmentsData.totalPages > 5 &&
                   currentPage < appointmentsData.totalPages - 2 && (
                     <span className="px-2 py-2 text-slate-400">...</span>
                   )}
               </div>
-
               <button
                 onClick={() =>
                   setCurrentPage((p) =>

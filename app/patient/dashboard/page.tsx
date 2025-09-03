@@ -71,19 +71,7 @@ export default function PatientDashboard() {
       </div>
 
       {/* Stats Cards Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-6">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl p-6 shadow-md">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm opacity-80">Available Doctors</p>
-              <p className="text-2xl font-bold mt-1">{doctorsData.length}</p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-              <span className="text-xl">👨‍⚕️</span>
-            </div>
-          </div>
-        </div>
-
+      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-6">
         <div className="bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-2xl p-6 shadow-md">
           <div className="flex items-center justify-between">
             <div>
@@ -98,20 +86,8 @@ export default function PatientDashboard() {
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-2xl p-6 shadow-md">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm opacity-80">Specializations</p>
-              <p className="text-2xl font-bold mt-1">
-                {specializationsData.length}
-              </p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-              <span className="text-xl">🏥</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      
+      </div> */}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Upcoming Appointments Card */}
@@ -163,13 +139,12 @@ export default function PatientDashboard() {
                         </p>
                       </div>
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          appointment.status === "PENDING"
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${appointment.status === "PENDING"
                             ? "bg-amber-100 text-amber-800"
                             : appointment.status === "COMPLETED"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
                       >
                         {appointment.status}
                       </span>
@@ -194,58 +169,13 @@ export default function PatientDashboard() {
         {/* Main Content Area */}
         <div className="lg:col-span-2">
           {/* Search Card */}
-          <div className="bg-white rounded-2xl shadow-sm p-6 mb-6 border border-blue-100">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-slate-800">
-                Find Doctors
-              </h2>
-              <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center">
-                <span className="text-teal-600">🔍</span>
-              </div>
-            </div>
-
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="relative flex-1">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-slate-400">🔍</span>
-                </div>
-                <input
-                  type="text"
-                  placeholder="Search doctors by name..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                />
-              </div>
-
-              <div className="relative md:w-1/3">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-slate-400">🏥</span>
-                </div>
-                <select
-                  value={specialization}
-                  onChange={(e) => setSpecialization(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none transition-all duration-200"
-                >
-                  <option value="ALL">All Specializations</option>
-                  {specializationsData.map((spec: string) => (
-                    <option key={spec} value={spec}>
-                      {spec}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                  <span className="text-slate-400">▼</span>
-                </div>
-              </div>
-            </div>
-          </div>
+     
 
           {/* Doctors List */}
           <div className="bg-white rounded-2xl shadow-sm p-6 border border-blue-100">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-slate-800">
-                Available Doctors
+                Doctors
               </h2>
               <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
                 <span className="text-indigo-600">👨‍⚕️</span>

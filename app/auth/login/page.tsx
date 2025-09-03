@@ -7,6 +7,7 @@ import { useLogin } from "../../../hooks/useLogin";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -150,9 +151,9 @@ export default function LoginPage() {
 
             <p className="text-center">
               Don't have an account?{" "}
-              <a href="/auth/registration" className="text-blue-500 underline font-bold">
+              <Link href="/auth/registration" className="text-blue-500 underline font-bold">
                 Register
-              </a>
+              </Link>
             </p>
           </form>
         </div>
