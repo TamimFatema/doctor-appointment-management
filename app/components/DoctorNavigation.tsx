@@ -13,7 +13,6 @@ export default function DoctorNavigation() {
 
   const navigationItems = [
     { name: "Dashboard", href: "/doctor/dashboard", icon: "🏠" },
-    { name: "Appointments", href: "/doctor/appointments", icon: "📅" },
   ];
 
   const isActive = (href: string) => pathname === href;

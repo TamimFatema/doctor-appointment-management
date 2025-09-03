@@ -1,15 +1,13 @@
-// app/patient/dashboard/page.tsx (updated modal usage)
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
-import { useAuthStore } from "../../../store/useAuthStore";
+import { usePatientAppointments } from "../../../hooks/useAppointments";
 import { useDoctors } from "../../../hooks/useDoctors";
 import { useSpecializations } from "../../../hooks/useSpecializations";
-import { usePatientAppointments } from "../../../hooks/useAppointments";
-import { api } from "../../../utils/api";        
-import Link from "next/link";
-import { DoctorList } from "../../components/DoctorList";
+import { useAuthStore } from "../../../store/useAuthStore";
 import { BookAppointmentModal } from "../../components/BookAppointmentModal";
+import { DoctorList } from "../../components/DoctorList";
 
 export default function PatientDashboard() {
   const user = useAuthStore((state) => state.user);
@@ -17,25 +15,34 @@ export default function PatientDashboard() {
   const [specialization, setSpecialization] = useState("ALL");
   const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("PENDING");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: doctorsData = [], refetch: refetchDoctors } = useDoctors(search, specialization === "ALL" ? "" : specialization);
-  const { data: specializationsData = [] } = useSpecializations();
-  const { data: appointmentsData, refetch: refetchAppointments } = usePatientAppointments(
-    user?.id || "",
-    "PENDING",
-    1
+  const { data: doctorsData = [], refetch: refetchDoctors } = useDoctors(
+    search,
+    specialization === "ALL" ? "" : specialization
   );
 
+  const { data: specializationsData = [] } = useSpecializations();
+
+  const {
+    data: appointmentsData,
+    isLoading: appointmentsLoading,
+    refetch: refetchAppointments,
+  } = usePatientAppointments(
+    statusFilter,
+    currentPage,
+    true
+  );
+  const upcomingAppointments = appointmentsData?.data ?? [];
   const handleBookClick = (doctor: any) => {
     setSelectedDoctor(doctor);
     setShowBookingModal(true);
   };
 
   const handleBookingSuccess = () => {
-    // Refresh appointments list after successful booking
-    refetchAppointments();
-    // Optionally refresh doctors list if needed
-    refetchDoctors();
+    refetchAppointments(); // Refresh appointments after booking
+    refetchDoctors(); // Optional refresh doctors list
   };
 
   const handleCloseModal = () => {
@@ -49,7 +56,9 @@ export default function PatientDashboard() {
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6 border border-blue-100">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
           <div>
-            <h1 className="text-3xl font-bold text-slate-800">Welcome back, {user?.name}</h1>
+            <h1 className="text-3xl font-bold text-slate-800">
+              Welcome back, {user?.name}
+            </h1>
             <p className="text-slate-600 mt-2">How are you feeling today?</p>
           </div>
           <Link
@@ -61,44 +70,107 @@ export default function PatientDashboard() {
         </div>
       </div>
 
+      {/* Stats Cards Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-6">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl p-6 shadow-md">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm opacity-80">Available Doctors</p>
+              <p className="text-2xl font-bold mt-1">{doctorsData.length}</p>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+              <span className="text-xl">👨‍⚕️</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-2xl p-6 shadow-md">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm opacity-80">Upcoming Appointments</p>
+              <p className="text-2xl font-bold mt-1">
+                {appointmentsData?.total || 0}
+              </p>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+              <span className="text-xl">📅</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-2xl p-6 shadow-md">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm opacity-80">Specializations</p>
+              <p className="text-2xl font-bold mt-1">
+                {specializationsData.length}
+              </p>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+              <span className="text-xl">🏥</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Upcoming Appointments Card */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-2xl shadow-sm p-6 h-full border border-blue-100">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-slate-800">Upcoming Appointments</h2>
+              <h2 className="text-xl font-semibold text-slate-800">
+                Upcoming Appointments
+              </h2>
               <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
                 <span className="text-blue-600">📅</span>
               </div>
             </div>
-            
-            {appointmentsData?.appointments?.length > 0 ? (
+
+            {appointmentsLoading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-slate-500">Loading appointments...</p>
+              </div>
+            ) : upcomingAppointments.length > 0 ? (
               <div className="space-y-4">
-                {appointmentsData.appointments.slice(0, 3).map((appointment: any) => (
-                  <div key={appointment.id} className="border border-blue-50 rounded-xl p-4 bg-blue-50/50 hover:bg-blue-50 transition-colors duration-200">
+                {upcomingAppointments.slice(0, 3).map((appointment: any) => (
+                  <div
+                    key={appointment.id}
+                    className="border border-blue-50 rounded-xl p-4 bg-blue-50/50 hover:bg-blue-50 transition-colors duration-200"
+                  >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <p className="font-semibold text-slate-800">Dr. {appointment.doctor.name}</p>
-                        <p className="text-sm text-slate-600 mt-1">{appointment.doctor.specialization}</p>
+                        <p className="font-semibold text-slate-800">
+                          Dr. {appointment.doctor.name}
+                        </p>
+                        <p className="text-sm text-slate-600 mt-1">
+                          {appointment.doctor.specialization}
+                        </p>
                         <p className="text-sm text-slate-500 mt-2">
-                          {new Date(appointment.date).toLocaleDateString('en-US', { 
-                            weekday: 'short', 
-                            month: 'short', 
-                            day: 'numeric' 
-                          })} at{" "}
-                          {new Date(appointment.date).toLocaleTimeString([], { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
+                          {new Date(appointment.date).toLocaleDateString(
+                            "en-US",
+                            {
+                              weekday: "short",
+                              month: "short",
+                              day: "numeric",
+                            }
+                          )}{" "}
+                          at{" "}
+                          {new Date(appointment.date).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
                           })}
                         </p>
                       </div>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        appointment.status === "PENDING" 
-                          ? "bg-amber-100 text-amber-800" 
-                          : appointment.status === "COMPLETED" 
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          appointment.status === "PENDING"
+                            ? "bg-amber-100 text-amber-800"
+                            : appointment.status === "COMPLETED"
                             ? "bg-green-100 text-green-800"
                             : "bg-red-100 text-red-800"
-                      }`}>
+                        }`}
+                      >
                         {appointment.status}
                       </span>
                     </div>
@@ -111,7 +183,9 @@ export default function PatientDashboard() {
                   <span className="text-2xl text-blue-500">👨‍⚕️</span>
                 </div>
                 <p className="text-slate-500">No upcoming appointments</p>
-                <p className="text-sm text-slate-400 mt-1">Book your first appointment today</p>
+                <p className="text-sm text-slate-400 mt-1">
+                  Book your first appointment today
+                </p>
               </div>
             )}
           </div>
@@ -122,12 +196,14 @@ export default function PatientDashboard() {
           {/* Search Card */}
           <div className="bg-white rounded-2xl shadow-sm p-6 mb-6 border border-blue-100">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-slate-800">Find Doctors</h2>
+              <h2 className="text-xl font-semibold text-slate-800">
+                Find Doctors
+              </h2>
               <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center">
                 <span className="text-teal-600">🔍</span>
               </div>
             </div>
-            
+
             <div className="flex flex-col md:flex-row gap-4">
               <div className="relative flex-1">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -141,7 +217,7 @@ export default function PatientDashboard() {
                   className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 />
               </div>
-              
+
               <div className="relative md:w-1/3">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <span className="text-slate-400">🏥</span>
@@ -168,12 +244,14 @@ export default function PatientDashboard() {
           {/* Doctors List */}
           <div className="bg-white rounded-2xl shadow-sm p-6 border border-blue-100">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-slate-800">Available Doctors</h2>
+              <h2 className="text-xl font-semibold text-slate-800">
+                Available Doctors
+              </h2>
               <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
                 <span className="text-indigo-600">👨‍⚕️</span>
               </div>
             </div>
-            
+
             <DoctorList
               doctors={doctorsData}
               onBook={handleBookClick}
@@ -191,45 +269,6 @@ export default function PatientDashboard() {
           onSuccess={handleBookingSuccess}
         />
       )}
-
-      {/* Stats Cards Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl p-6 shadow-md">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm opacity-80">Total Doctors</p>
-              <p className="text-2xl font-bold mt-1">{doctorsData.length}</p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-              <span className="text-xl">👨‍⚕️</span>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-2xl p-6 shadow-md">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm opacity-80">Upcoming Appointments</p>
-              <p className="text-2xl font-bold mt-1">{appointmentsData?.appointments?.length || 0}</p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-              <span className="text-xl">📅</span>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-2xl p-6 shadow-md">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm opacity-80">Specializations</p>
-              <p className="text-2xl font-bold mt-1">{specializationsData.length}</p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-              <span className="text-xl">🏥</span>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

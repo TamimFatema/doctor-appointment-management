@@ -28,7 +28,7 @@ export const AppointmentCard = ({
         return "bg-green-100 text-green-800 border-green-200";
       case "CANCELLED":
         return "bg-red-100 text-red-800 border-red-200";
-      default: // PENDING
+      default:
         return "bg-amber-100 text-amber-800 border-amber-200";
     }
   };
@@ -41,7 +41,7 @@ export const AppointmentCard = ({
         return "✅";
       case "CANCELLED":
         return "❌";
-      default: // PENDING
+      default:
         return "⏳";
     }
   };

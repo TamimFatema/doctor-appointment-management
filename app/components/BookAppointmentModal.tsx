@@ -1,19 +1,20 @@
+// components/BookAppointmentModal.tsx (using React Query hooks)
 'use client';
 import { useState } from "react";
-import { api } from "../../utils/api";
+import { useCreateAppointment } from "../../hooks/useAppointments";
 
 interface ModalProps {
   doctor: { id: string; name: string; specialization?: string };
   onClose: () => void;
-  onSuccess: () => void; // Callback for successful booking
+  onSuccess: () => void;
 }
 
 export const BookAppointmentModal = ({ doctor, onClose, onSuccess }: ModalProps) => {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [step, setStep] = useState<"date" | "time" | "confirm">("date");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  
+  const { mutate: createAppointment, isPending, error, reset } = useCreateAppointment();
 
   // Generate time slots (9 AM to 5 PM)
   const timeSlots = Array.from({ length: 9 }, (_, i) => {
@@ -24,42 +25,34 @@ export const BookAppointmentModal = ({ doctor, onClose, onSuccess }: ModalProps)
   const handleDateSelect = (date: string) => {
     setSelectedDate(date);
     setStep("time");
-    setError("");
+    reset(); // Clear any previous errors
   };
 
   const handleTimeSelect = (time: string) => {
     setSelectedTime(time);
     setStep("confirm");
-    setError("");
+    reset(); // Clear any previous errors
   };
 
-  const handleConfirm = async () => {
-    if (!selectedDate || !selectedTime) {
-      setError("Please select both date and time");
-      return;
-    }
+  const handleConfirm = () => {
+    if (!selectedDate || !selectedTime) return;
 
-    setIsLoading(true);
-    setError("");
-
-    try {
-      // Combine date and time into ISO string
-      const dateTimeString = `${selectedDate}T${selectedTime}:00.000Z`;
-      
-      // Make API call to book appointment
-      await api.post("/appointments", {
-        doctorId: doctor.id,
-        date: dateTimeString
-      });
-
-      onSuccess(); // Notify parent component of success
-      onClose(); // Close the modal
-      
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to book appointment. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+    const dateTimeString = `${selectedDate}T${selectedTime}:00.000Z`;
+    
+    createAppointment(
+      { doctorId: doctor.id, date: dateTimeString },
+      {
+        onSuccess: (data) => {
+          if (data.success) {
+            onSuccess();
+            onClose();
+          }
+        },
+        onError: () => {
+          // Error is already handled by the hook and available in the error state
+        }
+      }
+    );
   };
 
   const getFormattedDate = (dateString: string) => {
@@ -86,7 +79,7 @@ export const BookAppointmentModal = ({ doctor, onClose, onSuccess }: ModalProps)
             </div>
             <button
               onClick={onClose}
-              disabled={isLoading}
+              disabled={isPending}
               className="text-white hover:text-blue-200 transition-colors duration-200 disabled:opacity-50"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,7 +99,7 @@ export const BookAppointmentModal = ({ doctor, onClose, onSuccess }: ModalProps)
                 </svg>
               </div>
               <div className="ml-3">
-                <p className="text-sm text-red-700">{error}</p>
+                <p className="text-sm text-red-700">{error.message}</p>
               </div>
             </div>
           </div>
@@ -173,7 +166,8 @@ export const BookAppointmentModal = ({ doctor, onClose, onSuccess }: ModalProps)
                     <button
                       key={dateString}
                       onClick={() => handleDateSelect(dateString)}
-                      className={`p-3 rounded-lg border transition-all duration-200 ${
+                      disabled={isPending}
+                      className={`p-3 rounded-lg border transition-all duration-200 disabled:opacity-50 ${
                         isSelected
                           ? "bg-blue-500 text-white border-blue-500"
                           : "bg-white text-slate-700 border-slate-200 hover:border-blue-300"
@@ -207,7 +201,8 @@ export const BookAppointmentModal = ({ doctor, onClose, onSuccess }: ModalProps)
                   <button
                     key={time}
                     onClick={() => handleTimeSelect(time)}
-                    className={`p-3 rounded-xl border transition-all duration-200 ${
+                    disabled={isPending}
+                    className={`p-3 rounded-xl border transition-all duration-200 disabled:opacity-50 ${
                       selectedTime === time
                         ? "bg-blue-500 text-white border-blue-500"
                         : "bg-white text-slate-700 border-slate-200 hover:border-blue-300 hover:bg-blue-50"
@@ -220,7 +215,8 @@ export const BookAppointmentModal = ({ doctor, onClose, onSuccess }: ModalProps)
               
               <button
                 onClick={() => setStep("date")}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium mt-4"
+                disabled={isPending}
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium mt-4 disabled:opacity-50"
               >
                 ← Back to date selection
               </button>
@@ -263,17 +259,17 @@ export const BookAppointmentModal = ({ doctor, onClose, onSuccess }: ModalProps)
               <div className="flex space-x-3">
                 <button
                   onClick={() => setStep("time")}
-                  disabled={isLoading}
+                  disabled={isPending}
                   className="flex-1 py-3 px-4 border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 transition-all duration-200 disabled:opacity-50"
                 >
                   ← Back
                 </button>
                 <button
                   onClick={handleConfirm}
-                  disabled={isLoading}
+                  disabled={isPending || !selectedDate || !selectedTime}
                   className="flex-1 bg-gradient-to-r from-blue-500 to-teal-500 text-white py-3 px-4 rounded-xl font-medium shadow-md hover:from-blue-600 hover:to-teal-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isLoading ? (
+                  {isPending ? (
                     <div className="flex items-center justify-center">
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                       Booking...
