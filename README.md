@@ -1,3 +1,5 @@
+Hosted project: https://doctor-appointment-manage.netlify.app/
+
 🏥 Doctor Appointment System
 
 A modern healthcare appointment booking platform built with Next.js, TypeScript, and Tailwind CSS for an internship assessment at Hishabee Tecnologies Limited. This app enables patients to browse and book appointments with doctors, while doctors can manage their schedules efficiently.
