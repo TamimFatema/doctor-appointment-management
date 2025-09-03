@@ -19,7 +19,7 @@ export default function LandingPage() {
             Login
           </Link>
           <Link
-            href="/auth/register"
+            href="/auth/registration"
             className="bg-green-600 text-white py-3 rounded-md text-lg font-medium hover:bg-green-700 transition"
           >
             Register

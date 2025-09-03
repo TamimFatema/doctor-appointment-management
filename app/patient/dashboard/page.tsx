@@ -1,92 +1,233 @@
+// app/patient/dashboard/page.tsx (updated modal usage)
 "use client";
 
 import { useState } from "react";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { useDoctors } from "../../../hooks/useDoctors";
+import { useSpecializations } from "../../../hooks/useSpecializations";
 import { usePatientAppointments } from "../../../hooks/useAppointments";
-import { api } from "../../../utils/api";
+import { api } from "../../../utils/api";        
+import Link from "next/link";
 import { DoctorList } from "../../components/DoctorList";
 import { BookAppointmentModal } from "../../components/BookAppointmentModal";
-import { AppointmentCard } from "../../components/AppointmentCard";
-
-interface Doctor {
-  id: string;
-  name: string;
-  specialization: string;
-  photo_url: string | null;
-}
-
-interface Appointment {
-  id: string;
-  doctor: Doctor;
-  date: string;
-  status: string;
-}
 
 export default function PatientDashboard() {
   const user = useAuthStore((state) => state.user);
   const [search, setSearch] = useState("");
-  const [specialization, setSpecialization] = useState("");
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [specialization, setSpecialization] = useState("ALL");
+  const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
-  const { data: doctorsData = [] } = useDoctors(search, specialization);
-  const { data: appointmentsData, refetch } = usePatientAppointments(
-    user?.id || ""
+  const { data: doctorsData = [], refetch: refetchDoctors } = useDoctors(search, specialization === "ALL" ? "" : specialization);
+  const { data: specializationsData = [] } = useSpecializations();
+  const { data: appointmentsData, refetch: refetchAppointments } = usePatientAppointments(
+    user?.id || "",
+    "PENDING",
+    1
   );
 
-  const handleBook = async (date: string) => {
-    if (!selectedDoctor) return;
-    await api.post("/appointments", { doctorId: selectedDoctor.id, date });
+  const handleBookClick = (doctor: any) => {
+    setSelectedDoctor(doctor);
+    setShowBookingModal(true);
+  };
+
+  const handleBookingSuccess = () => {
+    // Refresh appointments list after successful booking
+    refetchAppointments();
+    // Optionally refresh doctors list if needed
+    refetchDoctors();
+  };
+
+  const handleCloseModal = () => {
+    setShowBookingModal(false);
     setSelectedDoctor(null);
-    refetch();
-    alert("Appointment booked successfully!");
   };
 
   return (
-    <div className="min-h-screen p-6 bg-gray-400">
-      <h1 className="text-3xl font-bold mb-6">Welcome, {user?.name}</h1>
-
-      {/* Search + filter */}
-      <div className="flex gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Search doctors..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="border px-3 py-2 rounded flex-1"
-        />
-        <input
-          type="text"
-          placeholder="Filter by specialization..."
-          value={specialization}
-          onChange={(e) => setSpecialization(e.target.value)}
-          className="border px-3 py-2 rounded"
-        />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 p-6">
+      {/* Header Section */}
+      <div className="bg-white rounded-2xl shadow-sm p-6 mb-6 border border-blue-100">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-800">Welcome back, {user?.name}</h1>
+            <p className="text-slate-600 mt-2">How are you feeling today?</p>
+          </div>
+          <Link
+            href="/patient/appointments"
+            className="mt-4 md:mt-0 bg-gradient-to-r from-blue-500 to-teal-500 hover:from-blue-600 hover:to-teal-600 text-white px-6 py-3 rounded-xl font-medium shadow-md hover:shadow-lg transition-all duration-200"
+          >
+            View All Appointments
+          </Link>
+        </div>
       </div>
 
-      {/* Doctor list with pagination */}
-      <DoctorList
-        doctors={doctorsData}
-        onBook={setSelectedDoctor}
-        itemsPerPage={6}
-      />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Upcoming Appointments Card */}
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-2xl shadow-sm p-6 h-full border border-blue-100">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-slate-800">Upcoming Appointments</h2>
+              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                <span className="text-blue-600">📅</span>
+              </div>
+            </div>
+            
+            {appointmentsData?.appointments?.length > 0 ? (
+              <div className="space-y-4">
+                {appointmentsData.appointments.slice(0, 3).map((appointment: any) => (
+                  <div key={appointment.id} className="border border-blue-50 rounded-xl p-4 bg-blue-50/50 hover:bg-blue-50 transition-colors duration-200">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <p className="font-semibold text-slate-800">Dr. {appointment.doctor.name}</p>
+                        <p className="text-sm text-slate-600 mt-1">{appointment.doctor.specialization}</p>
+                        <p className="text-sm text-slate-500 mt-2">
+                          {new Date(appointment.date).toLocaleDateString('en-US', { 
+                            weekday: 'short', 
+                            month: 'short', 
+                            day: 'numeric' 
+                          })} at{" "}
+                          {new Date(appointment.date).toLocaleTimeString([], { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })}
+                        </p>
+                      </div>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        appointment.status === "PENDING" 
+                          ? "bg-amber-100 text-amber-800" 
+                          : appointment.status === "COMPLETED" 
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                      }`}>
+                        {appointment.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 mx-auto rounded-full bg-blue-100 flex items-center justify-center mb-4">
+                  <span className="text-2xl text-blue-500">👨‍⚕️</span>
+                </div>
+                <p className="text-slate-500">No upcoming appointments</p>
+                <p className="text-sm text-slate-400 mt-1">Book your first appointment today</p>
+              </div>
+            )}
+          </div>
+        </div>
 
-      {/* Book appointment modal */}
-      {selectedDoctor && (
+        {/* Main Content Area */}
+        <div className="lg:col-span-2">
+          {/* Search Card */}
+          <div className="bg-white rounded-2xl shadow-sm p-6 mb-6 border border-blue-100">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-slate-800">Find Doctors</h2>
+              <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center">
+                <span className="text-teal-600">🔍</span>
+              </div>
+            </div>
+            
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="relative flex-1">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span className="text-slate-400">🔍</span>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search doctors by name..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                />
+              </div>
+              
+              <div className="relative md:w-1/3">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span className="text-slate-400">🏥</span>
+                </div>
+                <select
+                  value={specialization}
+                  onChange={(e) => setSpecialization(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none transition-all duration-200"
+                >
+                  <option value="ALL">All Specializations</option>
+                  {specializationsData.map((spec: string) => (
+                    <option key={spec} value={spec}>
+                      {spec}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <span className="text-slate-400">▼</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Doctors List */}
+          <div className="bg-white rounded-2xl shadow-sm p-6 border border-blue-100">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-slate-800">Available Doctors</h2>
+              <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                <span className="text-indigo-600">👨‍⚕️</span>
+              </div>
+            </div>
+            
+            <DoctorList
+              doctors={doctorsData}
+              onBook={handleBookClick}
+              itemsPerPage={6}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Booking Modal */}
+      {showBookingModal && selectedDoctor && (
         <BookAppointmentModal
           doctor={selectedDoctor}
-          onClose={() => setSelectedDoctor(null)}
-          onConfirm={handleBook}
+          onClose={handleCloseModal}
+          onSuccess={handleBookingSuccess}
         />
       )}
 
-      {/* Patient appointments */}
-      <div>
-        <h2 className="text-2xl font-bold mb-4">My Appointments</h2>
-        <div className="grid grid-cols-1 gap-4">
-          {appointmentsData?.map((app: Appointment) => (
-            <AppointmentCard key={app.id} appointment={app} />
-          ))}
+      {/* Stats Cards Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl p-6 shadow-md">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm opacity-80">Total Doctors</p>
+              <p className="text-2xl font-bold mt-1">{doctorsData.length}</p>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+              <span className="text-xl">👨‍⚕️</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-2xl p-6 shadow-md">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm opacity-80">Upcoming Appointments</p>
+              <p className="text-2xl font-bold mt-1">{appointmentsData?.appointments?.length || 0}</p>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+              <span className="text-xl">📅</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-2xl p-6 shadow-md">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm opacity-80">Specializations</p>
+              <p className="text-2xl font-bold mt-1">{specializationsData.length}</p>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+              <span className="text-xl">🏥</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

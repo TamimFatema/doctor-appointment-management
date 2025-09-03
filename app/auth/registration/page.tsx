@@ -8,8 +8,8 @@ import {
   doctorRegisterSchema,
   PatientRegisterForm,
   DoctorRegisterForm,
-} from "../../schemas/registerSchema";
-import { usePatientRegister, useDoctorRegister } from "../../hooks/useRegister";
+} from "../../../schemas/registerSchema";
+import { usePatientRegister, useDoctorRegister } from "../../../hooks/useRegister";
 
 export default function RegisterPage() {
   const [activeTab, setActiveTab] = useState<"PATIENT" | "DOCTOR">("PATIENT");
