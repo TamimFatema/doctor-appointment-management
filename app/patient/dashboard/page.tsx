@@ -70,24 +70,6 @@ export default function PatientDashboard() {
         </div>
       </div>
 
-      {/* Stats Cards Row */}
-      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-6">
-        <div className="bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-2xl p-6 shadow-md">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm opacity-80">Upcoming Appointments</p>
-              <p className="text-2xl font-bold mt-1">
-                {appointmentsData?.total || 0}
-              </p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-              <span className="text-xl">📅</span>
-            </div>
-          </div>
-        </div>
-
-      
-      </div> */}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Upcoming Appointments Card */}
@@ -98,7 +80,22 @@ export default function PatientDashboard() {
                 Upcoming Appointments
               </h2>
               <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                <span className="text-blue-600">📅</span>
+                <span className="text-blue-500 w-6 h-6">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-6 h-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                </span>
               </div>
             </div>
 
@@ -140,10 +137,10 @@ export default function PatientDashboard() {
                       </div>
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${appointment.status === "PENDING"
-                            ? "bg-amber-100 text-amber-800"
-                            : appointment.status === "COMPLETED"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
+                          ? "bg-amber-100 text-amber-800"
+                          : appointment.status === "COMPLETED"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
                           }`}
                       >
                         {appointment.status}
@@ -154,9 +151,6 @@ export default function PatientDashboard() {
               </div>
             ) : (
               <div className="text-center py-8">
-                <div className="w-16 h-16 mx-auto rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                  <span className="text-2xl text-blue-500">👨‍⚕️</span>
-                </div>
                 <p className="text-slate-500">No upcoming appointments</p>
                 <p className="text-sm text-slate-400 mt-1">
                   Book your first appointment today
@@ -169,7 +163,7 @@ export default function PatientDashboard() {
         {/* Main Content Area */}
         <div className="lg:col-span-2">
           {/* Search Card */}
-     
+
 
           {/* Doctors List */}
           <div className="bg-white rounded-2xl shadow-sm p-6 border border-blue-100">
@@ -177,9 +171,7 @@ export default function PatientDashboard() {
               <h2 className="text-xl font-semibold text-slate-800">
                 Doctors
               </h2>
-              <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
-                <span className="text-indigo-600">👨‍⚕️</span>
-              </div>
+      
             </div>
 
             <DoctorList

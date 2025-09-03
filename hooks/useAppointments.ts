@@ -90,7 +90,7 @@ export const useDoctorAppointments = (
         params.date = date;
       }
       
-      if (status && status !== "PENDING") {
+      if (status && status !== "ALL") {
         params.status = status;
       }
 

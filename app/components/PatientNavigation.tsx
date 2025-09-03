@@ -12,9 +12,46 @@ export default function PatientNavigation() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigationItems = [
-    { name: "Dashboard", href: "/patient/dashboard", icon: "🏠" },
-    { name: "Appointments", href: "/patient/appointments", icon: "📅" },
+    {
+      name: "Dashboard",
+      href: "/patient/dashboard",
+      icon: (
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 12l2-2m0 0l7-7 7 7M13 5v6h6m-6 0H7v6h6v-6z"
+          />
+        </svg>
+      ),
+    },
+    {
+      name: "Appointments",
+      href: "/patient/appointments",
+      icon: (
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
+        </svg>
+      ),
+    },
   ];
+
 
   const isActive = (href: string) => pathname === href;
 
@@ -75,9 +112,8 @@ export default function PatientNavigation() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-40 w-64 h-screen pt-14 transition-transform ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-0"
-        } bg-white border-r border-gray-200 md:translate-x-0`}
+        className={`fixed top-0 left-0 z-40 w-64 h-screen pt-14 transition-transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-0"
+          } bg-white border-r border-gray-200 md:translate-x-0`}
       >
         <div className="h-full px-3 pb-4 overflow-y-auto bg-white">
           <div className="pt-4 pb-2 px-2">
@@ -98,11 +134,10 @@ export default function PatientNavigation() {
               <li key={item.name}>
                 <Link
                   href={item.href}
-                  className={`flex items-center p-2 rounded-lg hover:bg-gray-100 group ${
-                    isActive(item.href)
+                  className={`flex items-center p-2 rounded-lg hover:bg-gray-100 group ${isActive(item.href)
                       ? "text-blue-600 bg-blue-50"
                       : "text-gray-900"
-                  }`}
+                    }`}
                 >
                   <span className="text-lg mr-3">{item.icon}</span>
                   <span className="ml-3">{item.name}</span>

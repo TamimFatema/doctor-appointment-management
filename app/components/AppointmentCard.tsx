@@ -15,10 +15,10 @@ interface AppointmentCardProps {
   showActions?: boolean;
 }
 
-export const AppointmentCard = ({ 
-  appointment, 
-  onAction, 
-  showActions = false 
+export const AppointmentCard = ({
+  appointment,
+  onAction,
+  showActions = false,
 }: AppointmentCardProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -36,29 +36,79 @@ export const AppointmentCard = ({
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "CONFIRMED":
-        return "✅";
       case "COMPLETED":
-        return "✅";
+        return (
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={3}
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        );
       case "CANCELLED":
-        return "❌";
+        return (
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={3}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        );
       default:
-        return "⏳";
+        return (
+          <svg
+            className="w-4 h-4 animate-spin"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              strokeWidth={4}
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+            />
+          </svg>
+        );
     }
   };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return {
-      date: date.toLocaleDateString('en-US', { 
-        weekday: 'short', 
-        month: 'short', 
-        day: 'numeric' 
+      date: date.toLocaleDateString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
       }),
-      time: date.toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
-        minute: '2-digit',
-        hour12: true 
-      })
+      time: date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      }),
     };
   };
 
@@ -80,7 +130,20 @@ export const AppointmentCard = ({
                     className="w-14 h-14 rounded-xl object-cover"
                   />
                 ) : (
-                  <span className="text-2xl text-blue-600">👨‍⚕️</span>
+                  <svg
+                    className="w-8 h-8 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                    />
+                  </svg>
                 )}
               </div>
             </div>
@@ -93,28 +156,50 @@ export const AppointmentCard = ({
               <p className="text-slate-600 text-sm mb-2">
                 {appointment.doctor.specialization}
               </p>
-              
+
               {/* Appointment Date & Time */}
               <div className="flex items-center space-x-4 text-sm text-slate-600">
                 <div className="flex items-center">
-                  <span className="mr-1">📅</span>
+                  <svg
+                    className="w-4 h-4 mr-1 text-slate-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
                   <span>{formattedDate}</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="mr-1">⏰</span>
+                  <svg
+                    className="w-4 h-4 mr-1 text-slate-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
                   <span>{formattedTime}</span>
                 </div>
               </div>
 
-              {/* Symptoms (if available) */}
+              {/* Symptoms & Notes */}
               {appointment.symptoms && (
                 <div className="mt-3">
                   <p className="text-xs text-slate-500 font-medium">Symptoms:</p>
                   <p className="text-sm text-slate-700">{appointment.symptoms}</p>
                 </div>
               )}
-
-              {/* Notes (if available) */}
               {appointment.notes && (
                 <div className="mt-2">
                   <p className="text-xs text-slate-500 font-medium">Notes:</p>
@@ -127,30 +212,24 @@ export const AppointmentCard = ({
 
         {/* Status & Actions Section */}
         <div className="flex flex-col items-end justify-between space-y-4">
-          {/* Status Badge */}
-          <div className={`inline-flex items-center px-3 py-1 rounded-full border text-xs font-medium ${getStatusColor(appointment.status)}`}>
+          <div
+            className={`inline-flex items-center px-3 py-1 rounded-full border text-xs font-medium ${getStatusColor(
+              appointment.status
+            )}`}
+          >
             <span className="mr-1">{getStatusIcon(appointment.status)}</span>
             {appointment.status}
           </div>
 
-          {/* Action Buttons */}
           {showActions && onAction && (
             <div className="flex space-x-2">
               {appointment.status === "PENDING" && (
-                <>
-                  {/* <button
-                    onClick={() => onAction(appointment.id, " ")}
-                    className="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-colors duration-200"
-                  >
-                    Confirm
-                  </button> */}
-                  <button
-                    onClick={() => onAction(appointment.id, "cancel")}
-                    className="px-3 py-1 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition-colors duration-200"
-                  >
-                    Cancel
-                  </button>
-                </>
+                <button
+                  onClick={() => onAction(appointment.id, "cancel")}
+                  className="px-3 py-1 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition-colors duration-200"
+                >
+                  Cancel
+                </button>
               )}
               {appointment.status === "CONFIRMED" && (
                 <button
@@ -163,12 +242,9 @@ export const AppointmentCard = ({
             </div>
           )}
 
-          {/* Time Until Appointment */}
           <div className="text-xs text-slate-400 text-right">
             {new Date(appointment.date) > new Date() ? (
-              <>
-                In {Math.ceil((new Date(appointment.date).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days
-              </>
+              <>In {Math.ceil((new Date(appointment.date).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days</>
             ) : (
               <>Completed</>
             )}
@@ -176,7 +252,6 @@ export const AppointmentCard = ({
         </div>
       </div>
 
-      {/* Additional Information */}
       <div className="mt-4 pt-4 border-t border-slate-100">
         <div className="flex items-center justify-between text-xs text-slate-500">
           <span>Appointment ID: #{appointment.id.slice(-8).toUpperCase()}</span>

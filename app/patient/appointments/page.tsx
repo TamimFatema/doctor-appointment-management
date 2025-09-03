@@ -85,7 +85,22 @@ export default function PatientAppointments() {
         <div className="bg-white rounded-2xl shadow-sm p-6 border border-red-100">
           <div className="text-center py-8">
             <div className="w-16 h-16 mx-auto rounded-full bg-red-100 flex items-center justify-center mb-4">
-              <span className="text-2xl text-red-500">⚠️</span>
+              <span className="text-red-500 w-6 h-6">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-6 h-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01M4.93 19h14.14a1 1 0 00.93-1.37l-7.07-12.25a1 1 0 00-1.73 0L4 17.63a1 1 0 00.93 1.37z"
+                  />
+                </svg>
+              </span>
             </div>
             <h2 className="text-xl font-semibold text-slate-800 mb-2">
               Error Loading Appointments
@@ -168,7 +183,22 @@ export default function PatientAppointments() {
           // Empty State
           <div className="bg-white rounded-2xl shadow-sm p-8 text-center border border-blue-100">
             <div className="w-20 h-20 mx-auto rounded-full bg-blue-100 flex items-center justify-center mb-4">
-              <span className="text-3xl text-blue-500">📅</span>
+              <span className="text-blue-500 w-6 h-6">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-6 h-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+              </span>
             </div>
             <h3 className="text-xl font-semibold text-slate-800 mb-2">
               No appointments found
@@ -243,11 +273,10 @@ export default function PatientAppointments() {
                         key={pageNum}
                         onClick={() => setCurrentPage(pageNum)}
                         disabled={isLoading}
-                        className={`w-10 h-10 rounded-xl transition-all duration-200 ${
-                          currentPage === pageNum
-                            ? "bg-gradient-to-r from-blue-500 to-teal-500 text-white shadow-md"
-                            : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
-                        }`}
+                        className={`w-10 h-10 rounded-xl transition-all duration-200 ${currentPage === pageNum
+                          ? "bg-gradient-to-r from-blue-500 to-teal-500 text-white shadow-md"
+                          : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
+                          }`}
                       >
                         {pageNum}
                       </button>

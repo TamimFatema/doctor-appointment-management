@@ -58,7 +58,6 @@ export const BookAppointmentModal = ({ doctor, onClose, onSuccess }: ModalProps)
     );
   };
 
-  // Auto-close modal on success after 3 seconds
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (status === "success") {
@@ -76,6 +75,44 @@ export const BookAppointmentModal = ({ doctor, onClose, onSuccess }: ModalProps)
       day: "numeric",
       year: "numeric",
     });
+
+  const DoctorIcon = () => (
+    <svg
+      className="w-8 h-8 text-blue-600"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+      />
+    </svg>
+  );
+
+  const SuccessIcon = () => (
+    <svg
+      className="w-12 h-12 text-green-600"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+    </svg>
+  );
+
+  const ErrorIcon = () => (
+    <svg
+      className="w-12 h-12 text-red-600"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  );
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
@@ -104,7 +141,7 @@ export const BookAppointmentModal = ({ doctor, onClose, onSuccess }: ModalProps)
 
         {/* Content */}
         <div className="p-6">
-          {/* Step: Date Selection */}
+          {/* Date Selection */}
           {step === "date" && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-slate-800">Select Date</h3>
@@ -119,7 +156,7 @@ export const BookAppointmentModal = ({ doctor, onClose, onSuccess }: ModalProps)
             </div>
           )}
 
-          {/* Step: Time Selection */}
+          {/* Time Selection */}
           {step === "time" && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-slate-800">Select Time</h3>
@@ -152,14 +189,14 @@ export const BookAppointmentModal = ({ doctor, onClose, onSuccess }: ModalProps)
             </div>
           )}
 
-          {/* Step: Confirm Booking */}
+          {/* Confirm Booking */}
           {step === "confirm" && (
             <div className="space-y-6">
               <h3 className="text-lg font-semibold text-slate-800">Confirm Appointment</h3>
               <div className="bg-blue-50 rounded-xl p-4">
                 <div className="flex items-center space-x-3 mb-3">
                   <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-blue-600 text-xl">👨‍⚕️</span>
+                    <DoctorIcon />
                   </div>
                   <div>
                     <p className="font-semibold text-slate-800">Dr. {doctor.name}</p>
@@ -202,13 +239,13 @@ export const BookAppointmentModal = ({ doctor, onClose, onSuccess }: ModalProps)
             </div>
           )}
 
-          {/* Step: Result */}
+          {/* Result */}
           {step === "result" && (
             <div className="text-center space-y-4">
               {status === "success" ? (
                 <div>
                   <div className="w-16 h-16 mx-auto rounded-full bg-green-100 flex items-center justify-center mb-4">
-                    <span className="text-3xl">✅</span>
+                    <SuccessIcon />
                   </div>
                   <h3 className="text-lg font-semibold text-green-700">Booking Confirmed!</h3>
                   <p className="text-slate-600 mt-2">
@@ -218,7 +255,7 @@ export const BookAppointmentModal = ({ doctor, onClose, onSuccess }: ModalProps)
               ) : (
                 <div>
                   <div className="w-16 h-16 mx-auto rounded-full bg-red-100 flex items-center justify-center mb-4">
-                    <span className="text-3xl">❌</span>
+                    <ErrorIcon />
                   </div>
                   <h3 className="text-lg font-semibold text-red-700">Booking Failed</h3>
                   <p className="text-slate-600 mt-2">

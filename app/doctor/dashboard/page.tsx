@@ -124,7 +124,6 @@ export default function DoctorDashboard() {
                             : "bg-red-100 text-red-800"
                         }`}
                     >
-                      <h1>HI</h1>
                       {appointment.status}
                     </span>
                   </div>
@@ -139,7 +138,7 @@ export default function DoctorDashboard() {
                           setActionType("COMPLETED");
                           setIsModalOpen(true);
                         }}
-                        className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                        className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700"
                       >
                         Mark Complete
                       </button>
@@ -149,7 +148,7 @@ export default function DoctorDashboard() {
                           setActionType("CANCELLED");
                           setIsModalOpen(true);
                         }}
-                        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                        className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700"
                       >
                         Cancel
                       </button>

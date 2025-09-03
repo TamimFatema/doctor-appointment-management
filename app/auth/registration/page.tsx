@@ -55,14 +55,12 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex w-full">
-      {/* Left: Form */}
       <div className="md:w-5/12 flex items-center justify-center p-8 bg-white text-gray-600">
         <div className="w-full max-w-md">
           <h1 className="text-2xl xl:text-3xl font-extrabold text-center mb-6">
             Register
           </h1>
 
-          {/* Tabs */}
           <div className="flex mb-6">
             <button
               onClick={() => setActiveTab("PATIENT")}
@@ -84,7 +82,8 @@ export default function RegisterPage() {
             </button>
           </div>
 
-          {/* Patient Form */}
+
+          {/* patient form */}
           {activeTab === "PATIENT" && (
             <form onSubmit={handlePatientSubmit(onPatientSubmit)} className="space-y-4">
               <input
@@ -197,9 +196,9 @@ export default function RegisterPage() {
               <p className="text-center">Already Registered?
                 <Link
                   href="/auth/login"
-                  className="text-blue-500 underline font-bold"
+                  className="text-indigo-500 underline font-bold"
                 >
-                   Login
+                  Login
                 </Link>
               </p>
             </form>
@@ -208,7 +207,6 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      {/* Right: Image */}
       <div className="w-7/12 relative hidden md:block">
         <Image
           src="/registration.jpg"
@@ -218,13 +216,24 @@ export default function RegisterPage() {
           priority
         />
       </div>
-
-      {/* Success Modal */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-xl">
             <div className="w-16 h-16 mx-auto rounded-full bg-green-100 flex items-center justify-center mb-4">
-              <span className="text-3xl">✅</span>
+              <svg
+                className="w-8 h-8 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={3}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
             </div>
             <h3 className="text-xl font-semibold text-green-700 mb-2">
               Registration Successful!
@@ -240,6 +249,7 @@ export default function RegisterPage() {
           </div>
         </div>
       )}
+
     </div>
   );
 }

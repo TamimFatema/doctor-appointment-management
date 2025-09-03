@@ -35,7 +35,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left: Image (9/12 width) */}
       <div className="relative w-8/12 hidden md:block">
         <Image
           src="/doctor-patient.jpg"
@@ -46,13 +45,11 @@ export default function LoginPage() {
         />
       </div>
 
-      {/* Right: Form (3/12 width) */}
       <div className="w-full md:w-4/12 flex items-center justify-center bg-white p-8">
         <div className="w-full max-w-sm">
           <h2 className="text-2xl font-bold mb-9 text-center text-gray-800">Welcome Back</h2>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 text-gray-500">
-            {/* Email */}
             <div className="flex items-center border border-gray-400 rounded gap-2 pl-2">
               <svg
                 width="18"
@@ -86,7 +83,6 @@ export default function LoginPage() {
             </div>
             {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
 
-            {/* Password */}
             <div className="flex items-center border border-gray-400 rounded gap-2 pl-2">
               <svg
                 width="13"
@@ -109,7 +105,6 @@ export default function LoginPage() {
             </div>
             {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
 
-            {/* Role */}
             <div className="flex items-center border border-gray-400 rounded gap-2 pl-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -137,12 +132,11 @@ export default function LoginPage() {
             {errors.role && <p className="text-red-500 text-sm">{errors.role.message}</p>}
 
 
-            {/* Button */}
             <div className="flex justify-center">
               <button
                 type="submit"
                 disabled={isPending}
-                className="w-1/2 mb-3 bg-indigo-500 hover:bg-indigo-600/90 transition py-2.5 rounded-2xl text-white font-medium"
+                className="w-1/2 bg-indigo-500 hover:bg-indigo-600/90 transition py-2.5 rounded-2xl text-white font-medium"
               >
                 {isPending ? "Logging in..." : "Log In"}
               </button>
@@ -151,7 +145,7 @@ export default function LoginPage() {
 
             <p className="text-center">
               Don't have an account?{" "}
-              <Link href="/auth/registration" className="text-blue-500 underline font-bold">
+              <Link href="/auth/registration" className="text-indigo-500 underline font-bold">
                 Register
               </Link>
             </p>
